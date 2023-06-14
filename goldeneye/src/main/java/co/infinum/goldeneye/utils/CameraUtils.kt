@@ -7,8 +7,6 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import android.hardware.Camera
 import android.hardware.camera2.CameraCharacteristics
-import android.os.Build
-import android.support.annotation.RequiresApi
 import android.view.Surface
 import android.view.TextureView
 import co.infinum.goldeneye.BaseGoldenEye
@@ -85,7 +83,6 @@ internal object CameraUtils {
         return matrix
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun calculateCamera2FocusArea(
         activity: Activity,
         textureView: TextureView,
@@ -253,7 +250,6 @@ internal object CameraUtils {
     /**
      * Calculate zoom rect by scaling active rect with zoom ratio.
      */
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun calculateCamera2ZoomRect(config: Camera2ConfigImpl): Rect? {
         val activeRect = config.characteristics?.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return null
         val zoomPercentage = config.zoom / 100f

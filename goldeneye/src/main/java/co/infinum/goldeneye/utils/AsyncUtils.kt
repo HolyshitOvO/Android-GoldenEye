@@ -1,9 +1,7 @@
 package co.infinum.goldeneye.utils
 
-import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
-import android.support.annotation.RequiresApi
 import co.infinum.goldeneye.ThreadNotStartedException
 
 /**
@@ -23,16 +21,12 @@ internal object AsyncUtils {
 
         backgroundThread = HandlerThread("GoldenEye")
         backgroundThread?.start()
-        _backgroundHandler = Handler(backgroundThread?.looper)
+        _backgroundHandler = Handler(backgroundThread!!.looper)
     }
 
     fun stopBackgroundThread() {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                backgroundThread?.quitSafely()
-            } else {
-                backgroundThread?.quit()
-            }
+            backgroundThread?.quitSafely()
             backgroundThread?.join()
         } catch (t: Throwable) {
             LogDelegate.log("Failed to stop background threads." ,t)

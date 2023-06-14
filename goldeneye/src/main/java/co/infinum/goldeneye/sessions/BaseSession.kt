@@ -5,20 +5,15 @@ import android.app.Activity
 import android.graphics.Rect
 import android.hardware.camera2.*
 import android.hardware.camera2.params.MeteringRectangle
-import android.os.Build
 import android.support.annotation.CallSuper
-import android.support.annotation.RequiresApi
 import android.view.Surface
 import android.view.TextureView
 import co.infinum.goldeneye.config.camera2.Camera2ConfigImpl
-import co.infinum.goldeneye.extensions.isFocusReady
-import co.infinum.goldeneye.extensions.isLocked
 import co.infinum.goldeneye.models.FocusMode
 import co.infinum.goldeneye.utils.AsyncUtils
 import co.infinum.goldeneye.utils.CameraUtils
 import co.infinum.goldeneye.utils.LogDelegate
 
-@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal abstract class BaseSession(
     protected val activity: Activity,
     protected val cameraDevice: CameraDevice,
@@ -75,7 +70,7 @@ internal abstract class BaseSession(
             }
             session?.stopRepeating()
             session?.capture(sessionBuilder?.build()!!, object : CameraCaptureSession.CaptureCallback() {
-                override fun onCaptureCompleted(session: CameraCaptureSession?, request: CaptureRequest?, result: TotalCaptureResult?) {
+                override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
                     startSession()
                 }
             }, AsyncUtils.backgroundHandler)

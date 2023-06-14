@@ -32,20 +32,28 @@ class SettingsAdapter(private var settingsItems: List<SettingsItem>
 	override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 		val item = settingsItems[position]
 		if (holder is ItemViewHolder) {
-			val title: TextView = item.findViewById(R.id.title)
-			val description: TextView = item.findViewById(R.id.description)
-			holder.itemView.apply {
-				nameView.text = item.name
-				valueView.text = item.value
-				setOnClickListener { item.onClick?.invoke() }
-			}
+			// val title: TextView = item.findViewById(R.id.title)
+			// val description: TextView = item.findViewById(R.id.description)
+			// holder.itemView.apply {
+			// 	nameView.text = item.name
+			// 	valueView.text = item.value
+			// 	setOnClickListener { item.onClick?.invoke() }
+			// }
+			holder.nameView.text = item.name
+			holder.valueView.text = item.value
+			holder.itemView.setOnClickListener { item.onClick?.invoke() }
+
 		} else if (holder is HeaderViewHolder) {
 			(holder.itemView as TextView).apply {
 				text = item.name
 			}
+			// holder.itemView.text = item.name
 		}
 	}
 
-	class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view)
+	class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+		var nameView: TextView = itemView.findViewById(R.id.nameView)
+		var valueView: TextView = itemView.findViewById(R.id.valueView)
+	}
 	class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }

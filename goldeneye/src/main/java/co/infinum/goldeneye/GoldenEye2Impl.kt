@@ -8,8 +8,6 @@ import android.graphics.Bitmap
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
-import android.os.Build
-import android.support.annotation.RequiresApi
 import android.support.annotation.RequiresPermission
 import android.view.TextureView
 import co.infinum.goldeneye.config.CameraConfig
@@ -30,7 +28,6 @@ import co.infinum.goldeneye.utils.LogDelegate
 import co.infinum.goldeneye.utils.LogDelegate.log
 import java.io.File
 
-@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class GoldenEye2Impl(
     private val activity: Activity,
     private val advancedFeaturesEnabled: Boolean,
@@ -82,7 +79,7 @@ internal class GoldenEye2Impl(
     @SuppressLint("MissingPermission")
     private fun openCamera(textureView: TextureView, cameraInfo: CameraInfo, callback: InitCallback) {
         cameraManager.openCamera(cameraInfo.id, object : CameraDevice.StateCallback() {
-            override fun onOpened(camera: CameraDevice?) {
+            override fun onOpened(camera: CameraDevice) {
                 if (lastCameraRequest != null) {
                     openLastRequestedCamera(lastCameraRequest!!)
                     return
@@ -96,11 +93,11 @@ internal class GoldenEye2Impl(
                 open(textureView, request.cameraInfo, request.callback)
             }
 
-            override fun onDisconnected(camera: CameraDevice?) {
+            override fun onDisconnected(camera: CameraDevice) {
                 releaseInternal()
             }
 
-            override fun onError(camera: CameraDevice?, error: Int) {
+            override fun onError(camera: CameraDevice, error: Int) {
                 val currentState = state
                 if (lastCameraRequest == null) {
                     releaseInternal()
@@ -276,7 +273,7 @@ internal class GoldenEye2Impl(
             }
             val cameraInfo = object : CameraInfo {
                 override val id = id
-                override val orientation = orientation
+                override val orientation = orientation!!
                 override val facing = facing
             }
             val videoConfig = VideoConfigImpl(id, onConfigUpdateListener)

@@ -3,15 +3,26 @@ package co.infinum.goldeneye.sessions
 import android.app.Activity
 import android.graphics.ImageFormat
 import android.graphics.Rect
-import android.hardware.camera2.*
+import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraDevice
+import android.hardware.camera2.CaptureRequest
+import android.hardware.camera2.CaptureResult
+import android.hardware.camera2.TotalCaptureResult
 import android.hardware.camera2.params.MeteringRectangle
 import android.media.ImageReader
-import android.os.Build
-import android.support.annotation.RequiresApi
 import android.view.TextureView
-import co.infinum.goldeneye.*
+import co.infinum.goldeneye.CameraConfigurationFailedException
+import co.infinum.goldeneye.InitCallback
+import co.infinum.goldeneye.PictureCallback
+import co.infinum.goldeneye.PictureConversionException
+import co.infinum.goldeneye.PictureTransformation
 import co.infinum.goldeneye.config.camera2.Camera2ConfigImpl
-import co.infinum.goldeneye.extensions.*
+import co.infinum.goldeneye.extensions.applyConfig
+import co.infinum.goldeneye.extensions.async
+import co.infinum.goldeneye.extensions.copyParamsFrom
+import co.infinum.goldeneye.extensions.isLocked
+import co.infinum.goldeneye.extensions.toBitmap
 import co.infinum.goldeneye.models.FocusMode
 import co.infinum.goldeneye.utils.AsyncUtils
 import co.infinum.goldeneye.utils.CameraUtils
@@ -44,7 +55,6 @@ import kotlin.math.min
  *
  * @see ImageReader
  */
-@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class PictureSession(
     activity: Activity,
     cameraDevice: CameraDevice,
@@ -62,10 +72,8 @@ internal class PictureSession(
     private var captureTimes = 0
 
     private val captureCallback = object : CameraCaptureSession.CaptureCallback() {
-        override fun onCaptureCompleted(session: CameraCaptureSession?, request: CaptureRequest?, result: TotalCaptureResult?) {
-            if (result != null) {
-                process(result)
-            }
+        override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
+            process(result)
         }
 
         private fun process(result: CaptureResult) {
