@@ -3,7 +3,7 @@ package co.infinum.goldeneye.config
 import co.infinum.goldeneye.models.Facing
 
 /**
- * General Camera info used by Camera APIs to open Camera.
+ * 相机 API 用于打开相机的常规相机信息。
  */
 interface CameraInfo {
     /**
@@ -12,14 +12,12 @@ interface CameraInfo {
     val id: String
 
     /**
-     * Camera orientation. Camera has its own orientation that is not in sync
-     * with Device orientation.
+     * 相机方向。相机有自己的方向，与设备方向不同步。
      */
     val orientation: Int
 
     /**
-     * Camera facing can be either FRONT, BACK or EXTERNAL.
-     * EXTERNAL cameras are mostly handled same as BACK cameras.
+     * 相机朝向可以是正面、背面或外部。外部摄像头的处理方式大多与后置摄像头相同。
      */
     val facing: Facing
 }

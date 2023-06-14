@@ -25,8 +25,7 @@ internal object CameraUtils {
     private const val FOCUS_AREA_SIZE = 200
 
     /**
-     * Camera and device orientation do not sync. This method will calculate
-     * their orientation difference so that can be used to sync them manually.
+     * 相机和设备方向不同步。此方法将计算它们的方向差，以便可用于手动同步它们。
      */
     fun calculateDisplayOrientation(activity: Activity, config: CameraInfo): Int {
         val deviceOrientation = getDeviceOrientation(activity)
@@ -35,23 +34,21 @@ internal object CameraUtils {
         return if (config.facing == Facing.FRONT) {
             (360 - (cameraOrientation + deviceOrientation) % 360) % 360
         } else {
-            (cameraOrientation - deviceOrientation + 360) % 360
+            // (cameraOrientation - deviceOrientation + 360 + 90) % 360
+            deviceOrientation
         }
     }
 
     /**
-     * This is needed to transform Preview so that it is not distorted.
+     * 这是转换预览以使其不失真的所必需的。
      *
-     * See pictures/ directory
-     * 1) Default behavior is that CameraPreview will scale to fill given View
-     * CameraPreview that is 100x100 will scale to 100x200 and that will lead to distorted image
+     * 查看图片目录
+     * 1） 默认行为是相机预览将缩放以填充给定的视图相机预览 100x100 将缩放到 100x200，这将导致图像失真
+     * 2）我们必须否定默认比例行为才能获得不失真的真实预览大小
      *
-     * 2) We have to negate default scale behavior to get real preview size that is not distorted
+     * 3） 应用黄金眼量表
      *
-     * 3) Apply GoldenEye scale
-     *
-     * After we reverse the process, we can scale our preview however we want regarding to PreviewScale
-     * of current config.
+     * 在我们逆转该过程后，我们可以根据需要扩展预览，以当前配置的预览规模。
      */
     fun calculateTextureMatrix(activity: Activity, textureView: TextureView, config: CameraConfig): Matrix {
         val matrix = Matrix()
@@ -60,7 +57,7 @@ internal object CameraUtils {
             return matrix.apply { postScale(0f, 0f) }
         }
 
-        /* scaleX and scaleY are used to reverse the process and scale is used to scale image according to PreviewScale */
+        /* scaleX 和 scaleY 用于反转过程，比例用于根据预览比例缩放图像*/
         val (scaleX, scaleY, scale) = calculateScale(activity, textureView, config)
 
         if (BaseGoldenEye.version == CameraApi.CAMERA2 && getDeviceOrientation(activity) % 180 != 0) {
@@ -91,7 +88,7 @@ internal object CameraUtils {
         y: Float
     ): Rect? {
         val rect = calculateFocusRect(activity, textureView, config, x, y) ?: return null
-        /* Get active Rect size. This corresponds to actual camera size seen by Camera2 API */
+        /* 获取活动的矩形大小。这对应于 Camera2 API 看到的实际相机大小*/
         val activeRect = config.characteristics?.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return null
         val scaleX = activeRect.width().toFloat() / config.previewSize.width
         val scaleY = activeRect.height().toFloat() / config.previewSize.height
@@ -127,11 +124,11 @@ internal object CameraUtils {
         val rect = calculateFocusRect(activity, textureView, config, x, y) ?: return null
 
         val previewSize = config.previewSize
-        /* Ratio of genius [-1000,1000] coordinates to scaled preview size */
+        /* 天才 [-1000，1000] 坐标与缩放预览大小的比率*/
         val cameraWidthRatio = 2000f / previewSize.width
         val cameraHeightRatio = 2000f / previewSize.height
 
-        /* Measure left and top rectangle point */
+        /* 测量左矩形和顶部矩形点*/
         val left = (cameraWidthRatio * rect.left - 1000).coerceIn(-1000f, 1000f - FOCUS_AREA_SIZE).toInt()
         val top = (cameraHeightRatio * rect.height() - 1000).coerceIn(-1000f, 1000f - FOCUS_AREA_SIZE).toInt()
         val right = min(left + FOCUS_AREA_SIZE, 1000)
@@ -207,15 +204,15 @@ internal object CameraUtils {
         val displayOrientation = calculateDisplayOrientation(activity, config)
         val previewSize = config.previewSize
         val textureViewSize = Size(textureView.width, textureView.height)
-        /* Calculate real scaled preview size */
+        /* 计算实际缩放的预览大小*/
         val scaledPreviewX = previewSize.width * scale
         val scaledPreviewY = previewSize.height * scale
 
-        /* Sync texture view orientation with camera orientation */
+        /* 将纹理视图方向与相机方向同步*/
         val rotatedTextureViewX = if (displayOrientation % 180 == 0) textureViewSize.width else textureViewSize.height
         val rotatedTextureViewY = if (displayOrientation % 180 == 0) textureViewSize.height else textureViewSize.width
 
-        /* Convert texture view x,y into camera x,y */
+        /* 将纹理视图 x，y 转换为相机 x，y*/
         val rotatedX = when (displayOrientation) {
             90 -> y
             180 -> textureViewSize.width - x
@@ -233,7 +230,7 @@ internal object CameraUtils {
             return null
         }
 
-        /* Convert camera x,y into preview x,y that translates x,y if preview is not fullscreen or if is scaled outside of screen */
+        /* 将相机 x，y 转换为预览 x，y，如果预览不是全屏或屏幕外缩放，则转换 x，y*/
         val translatedPreviewX = rotatedX - max(0f, (rotatedTextureViewX - scaledPreviewX) / 2)
         val translatedPreviewY = rotatedY - max(0f, (rotatedTextureViewY - scaledPreviewY) / 2)
 
@@ -248,19 +245,19 @@ internal object CameraUtils {
     }
 
     /**
-     * Calculate zoom rect by scaling active rect with zoom ratio.
+     * 通过缩放活动矩形与缩放比率来计算缩放矩形。
      */
     fun calculateCamera2ZoomRect(config: Camera2ConfigImpl): Rect? {
         val activeRect = config.characteristics?.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) ?: return null
         val zoomPercentage = config.zoom / 100f
 
-        /* Measure actual zoomed width and zoomed height */
+        /* 测量实际缩放宽度和缩放高度*/
         val zoomedWidth = (activeRect.width() / zoomPercentage).toInt()
         val zoomedHeight = (activeRect.height() / zoomPercentage).toInt()
         val halfWidthDiff = (activeRect.width() - zoomedWidth) / 2
         val halfHeightDiff = (activeRect.height() - zoomedHeight) / 2
 
-        /* Create zoomed rect */
+        /* 创建缩放矩形*/
         return Rect(
             max(0, halfWidthDiff),
             max(0, halfHeightDiff),

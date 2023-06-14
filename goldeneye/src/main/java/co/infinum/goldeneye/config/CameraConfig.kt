@@ -3,9 +3,7 @@ package co.infinum.goldeneye.config
 import co.infinum.goldeneye.IllegalCharacteristicsException
 
 /**
- * Main Camera configuration interface. It wraps all smaller interfaces
- * just to split implementation logic. For detailed documentation look
- * into extended interfaces.
+ * 主摄像头配置界面。它包装所有较小的接口只是为了拆分实现逻辑。有关详细文档，请查看扩展接口。
  */
 interface CameraConfig :
     CameraInfo,

@@ -32,10 +32,11 @@ import kotlin.math.min
 @SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity() {
 
-	private val mainHandler = Handler(Looper.getMainLooper())
 	private lateinit var goldenEye: GoldenEye
 	private lateinit var videoFile: File
 	private var isRecording = false
+
+	private val mainHandler = Handler(Looper.getMainLooper())
 	private var settingsAdapter = SettingsAdapter(listOf())
 
 	private val initCallback = object : InitCallback() {
@@ -48,22 +49,13 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 
-	private val logger = object : Logger {
-		override fun log(message: String) {
-			Log.e("GoldenEye", message)
-		}
 
-		override fun log(t: Throwable) {
-			t.printStackTrace()
-		}
-	}
 	private val binding by lazy {
 		ActivityMainBinding.inflate(layoutInflater)
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		// setContentView(R.layout.activity_main)
 		setContentView(binding.root)
 		AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 		initGoldenEye()
@@ -108,6 +100,9 @@ class MainActivity : AppCompatActivity() {
 			val currentIndex = goldenEye.availableCameras.indexOfFirst { goldenEye.config?.id == it.id }
 			val nextIndex = (currentIndex + 1) % goldenEye.availableCameras.size
 			openCamera(goldenEye.availableCameras[nextIndex])
+		}
+		binding.btnTest1.setOnClickListener {
+
 		}
 	}
 
@@ -230,6 +225,7 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 
+	@Deprecated("Deprecated in Java")
 	override fun onBackPressed() {
 		if (binding.settingsRecyclerView.visibility == View.VISIBLE) {
 			binding.settingsRecyclerView.visibility = View.GONE
@@ -268,6 +264,16 @@ class MainActivity : AppCompatActivity() {
 			}
 			prepare()
 			start()
+		}
+	}
+
+	private val logger = object : Logger {
+		override fun log(message: String) {
+			Log.e("GoldenEye", message)
+		}
+
+		override fun log(t: Throwable) {
+			t.printStackTrace()
 		}
 	}
 }
