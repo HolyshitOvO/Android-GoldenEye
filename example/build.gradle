@@ -30,9 +30,7 @@ android {
 
 dependencies {
     implementation project(":goldeneye")
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-//    implementation "androidx.appcompat:appcompat:1.6.1"
-//    implementation "androidx.recyclerview:recyclerview:1.3.0"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
 }

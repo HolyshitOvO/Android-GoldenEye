@@ -43,6 +43,7 @@
                android:padding="16dp"
                android:scaleType="fitCenter"
                android:tint="#fff"
+               android:text="镜像"
                android:drawableRight="@drawable/ic_record_video"
                />
 
@@ -54,6 +55,7 @@
                android:padding="16dp"
                android:scaleType="fitCenter"
                android:tint="#fff"
+               android:text="暂停 继续"
                android:drawableRight="@drawable/ic_take_picture"/>
 
             <Button
@@ -80,6 +82,7 @@
                android:layout_weight="1"
                android:padding="16dp"
                android:scaleType="fitCenter"
+               android:text="旋转"
                android:tint="#fff"
                android:drawableRight="@drawable/ic_record_video"
                />
@@ -92,6 +95,7 @@
                android:padding="16dp"
                android:scaleType="fitCenter"
                android:tint="#fff"
+               android:text="缩小"
                android:drawableRight="@drawable/ic_take_picture"/>
 
             <Button
@@ -102,6 +106,7 @@
                android:padding="16dp"
                android:scaleType="fitCenter"
                android:tint="#fff"
+               android:text="放大"
                android:drawableRight="@drawable/ic_switch_camera"/>
 
         </LinearLayout>

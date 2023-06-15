@@ -6,6 +6,7 @@ android {
     compileSdkVersion 33
     defaultConfig {
         minSdkVersion 21
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 29
     }
     compileOptions {
@@ -20,12 +21,8 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
-//    implementation "androidx.appcompat:appcompat:1.6.1"
-
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
 
-//apply from: '../tasks.gradle'
-//apply from: 'publish.gradle'
 
 //preBuild.dependsOn ':goldeneye:generateReadme'

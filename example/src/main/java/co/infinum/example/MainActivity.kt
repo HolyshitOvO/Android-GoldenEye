@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 	private var isRecording = false
 	private var rotateValue = 0
 	private var isMirrorInverted = false
+	private var isTestCameraRunning = true
+	private var isTestStopIndex = 0
 
 	private val mainHandler = Handler(Looper.getMainLooper())
 	private var settingsAdapter = SettingsAdapter(listOf())
@@ -127,6 +129,20 @@ class MainActivity : AppCompatActivity() {
 			// goldenEye.rotatePreview(rotateValue)
 			goldenEye.availableCameras[currentIndex].isMirrorInverted = isMirrorInverted
 			openCamera(goldenEye.availableCameras[currentIndex])
+		}
+		binding.btnTest5.setOnClickListener {
+			if (isTestCameraRunning) {
+				isTestStopIndex = goldenEye.availableCameras.indexOfFirst { goldenEye.config?.id == it.id }
+				goldenEye.release()
+				isTestCameraRunning=false
+			}else{
+				if (goldenEye.availableCameras.isNotEmpty()) {
+					// val currentIndex = goldenEye.availableCameras.indexOfFirst { goldenEye.config?.id == it.id }
+					// openCamera(goldenEye.availableCameras[currentIndex])
+					openCamera(goldenEye.availableCameras[isTestStopIndex])
+				}
+				isTestCameraRunning=true
+			}
 		}
 	}
 

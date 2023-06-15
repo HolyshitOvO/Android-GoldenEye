@@ -3,10 +3,8 @@ package co.infinum.goldeneye.config.camera2
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraCharacteristics.*
 import android.os.Build
-import androidx.annotation.RequiresApi
 import co.infinum.goldeneye.config.*
 
-@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class Camera2ConfigImpl(
     cameraInfo: CameraInfo,
     videoConfig: BaseVideoConfig<CameraCharacteristics>,
