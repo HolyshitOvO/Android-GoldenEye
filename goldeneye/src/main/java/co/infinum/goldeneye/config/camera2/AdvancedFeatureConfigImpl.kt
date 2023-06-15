@@ -1,15 +1,12 @@
 package co.infinum.goldeneye.config.camera2
 
 import android.hardware.camera2.CameraCharacteristics
-import android.os.Build
-import android.support.annotation.RequiresApi
 import co.infinum.goldeneye.config.BaseAdvancedFeatureConfig
 import co.infinum.goldeneye.models.AntibandingMode
 import co.infinum.goldeneye.models.CameraProperty
 import co.infinum.goldeneye.models.ColorEffectMode
 import co.infinum.goldeneye.models.WhiteBalanceMode
 
-@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AdvancedFeatureConfigImpl(
     advancedFeaturesEnabled: Boolean,
     onUpdateCallback: (CameraProperty) -> Unit

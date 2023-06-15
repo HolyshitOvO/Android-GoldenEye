@@ -16,6 +16,10 @@ interface CameraInfo {
      */
     val orientation: Int
 
+    var rotateValue: Int
+
+    var isMirrorInverted: Boolean
+
     /**
      * 相机朝向可以是正面、背面或外部。外部摄像头的处理方式大多与后置摄像头相同。
      */

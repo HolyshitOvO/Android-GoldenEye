@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import android.hardware.Camera
 import android.hardware.camera2.CameraCharacteristics
+import android.util.Log
 import android.view.Surface
 import android.view.TextureView
 import co.infinum.goldeneye.BaseGoldenEye
@@ -23,6 +24,7 @@ import kotlin.math.min
 
 internal object CameraUtils {
     private const val FOCUS_AREA_SIZE = 200
+    private const val TAG = "CameraUtils"
 
     /**
      * 相机和设备方向不同步。此方法将计算它们的方向差，以便可用于手动同步它们。
@@ -34,8 +36,9 @@ internal object CameraUtils {
         return if (config.facing == Facing.FRONT) {
             (360 - (cameraOrientation + deviceOrientation) % 360) % 360
         } else {
+            (cameraOrientation - deviceOrientation + 360) % 360
             // (cameraOrientation - deviceOrientation + 360 + 90) % 360
-            deviceOrientation
+            // deviceOrientation + 360 + 180
         }
     }
 
@@ -62,21 +65,32 @@ internal object CameraUtils {
 
         if (BaseGoldenEye.version == CameraApi.CAMERA2 && getDeviceOrientation(activity) % 180 != 0) {
             matrix.postScale(
-                textureView.height / textureView.width.toFloat() / scaleY * scale,
+                textureView.height / textureView.width.toFloat() / scaleY * scale * if (config.isMirrorInverted) -1 else 1,
                 textureView.width / textureView.height.toFloat() / scaleX * scale,
                 textureView.width / 2f,
                 textureView.height / 2f
             )
-            val rotation = calculateDisplayOrientation(activity, config).toFloat() - config.orientation
+            val rotation = calculateDisplayOrientation(activity, config).toFloat() - config.orientation + config.rotateValue
             matrix.postRotate(
                 if (config.facing == Facing.FRONT) -rotation else rotation,
                 textureView.width / 2f,
                 textureView.height / 2f
             )
         } else {
-            matrix.postScale(1 / scaleX * scale, 1 / scaleY * scale, textureView.width / 2f, textureView.height / 2f)
-        }
+            matrix.postScale(1 / scaleX * scale * if (config.isMirrorInverted) -1 else 1,
+                1 / scaleY * scale,
+                textureView.width / 2f,
+                textureView.height / 2f)
 
+            val rotation = calculateDisplayOrientation(activity, config).toFloat() - config.orientation + config.rotateValue
+            matrix.postRotate(
+                if (config.facing == Facing.FRONT) -rotation else rotation,
+                textureView.width / 2f,
+                textureView.height / 2f
+            )
+
+        }
+        Log.e(TAG, "calculateTextureMatrix: ████ "  + "  "+(1 / scaleX * scale))
         return matrix
     }
 

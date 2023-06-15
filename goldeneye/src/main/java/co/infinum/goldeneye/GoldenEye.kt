@@ -11,9 +11,8 @@ import android.graphics.Point
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.os.Build
-import android.support.annotation.RequiresApi
-import android.support.annotation.RequiresPermission
 import android.view.TextureView
+import androidx.annotation.RequiresPermission
 import co.infinum.goldeneye.config.CameraConfig
 import co.infinum.goldeneye.config.CameraInfo
 import co.infinum.goldeneye.models.CameraApi
@@ -24,24 +23,20 @@ import java.io.File
 interface GoldenEye {
     companion object {
         /**
-         * Returned Camera API will be used by default. Change Camera API with [GoldenEye.Builder.setCameraApi] method.
+         * 默认情况下将使用返回的相机API。使用[GoldenEye.Builder.setCameraApi]方法更改相机API。
          *
-         * @return preferred Camera API that will be used by default.
+         * @return 默认情况下使用的首选相机API。
          */
         fun preferredCameraApi(context: Context) = if (shouldUseCamera2Api(context)) CameraApi.CAMERA2 else CameraApi.CAMERA1
 
         private fun shouldUseCamera2Api(context: Context) =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && isLegacyCamera(context).not()
-                && IncompatibleDevicesUtils.isIncompatibleDevice(Build.MODEL).not()
+            isLegacyCamera(context).not() && IncompatibleDevicesUtils.isIncompatibleDevice(Build.MODEL).not()
 
         /**
-         * There were more issues than benefits when using Legacy camera with Camera2 API.
-         * I found it to be working much better with deprecated Camera1 API instead.
+         * 将 Legacy 相机与 Camera2 API 结合使用时，问题多于好处。 我发现它在使用已弃用的 Camera1 API 时效果更好。
          *
          * @see CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY
          */
-        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         private fun isLegacyCamera(context: Context): Boolean {
             return try {
                 val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
@@ -58,31 +53,29 @@ interface GoldenEye {
     }
 
     /**
-     * List of available cameras. List is available as soon as GoldenEye
-     * instance is initialized.
+     * 可用摄像机列表。一旦GoldenEye实例初始化，列表就可用。
      *
      * @see CameraInfo
      */
     val availableCameras: List<CameraInfo>
 
     /**
-     * Currently opened camera configuration. Be sure to access it only after
-     * [InitCallback.onReady] is received.
+     * 当前打开的摄像头配置。请确保只有在收到[InitCallback.onReady]之后才能访问它。
      *
-     * If camera is in CLOSED or INITIALIZING state, null is returned.
+     * 如果相机处于CLOSED（关闭）或INITIALIZING（初始化）状态，则返回null。
      */
     val config: CameraConfig?
 
     /**
-     * Asynchronously opens the camera.
+     * 异步打开相机。
      *
-     * @param textureView that will display camera preview
-     * @param cameraInfo of the camera that should be opened
-     * @param callback used to notify whether camera successfully initialized
+     * @param textureView 将显示相机预览
+     * @param cameraInfo  应打开的相机信息
+     * @param callback 用于通知相机是否成功初始化
      *
      * @see InitCallback
      *
-     * @throws MissingCameraPermissionException if camera permission is missing
+     * @throws MissingCameraPermissionException 如果缺少摄像头权限
      */
     @RequiresPermission(Manifest.permission.CAMERA)
     fun open(textureView: TextureView, cameraInfo: CameraInfo, callback: InitCallback)
@@ -96,14 +89,14 @@ interface GoldenEye {
     )
 
     /**
-     * Release resources when camera is not used anymore. It stops the camera
-     * and all callbacks will be canceled.
+     * 不再使用相机时释放资源。它会停止相机，所有回调都将被取消。
      */
     fun release()
 
+    fun setZoomInOrZoomOut(value:Int)
+
     /**
-     * Asynchronously tries to take picture. If any error happens,
-     * [PictureCallback.onError] is called.
+     * 异步尝试拍照。如果发生任何错误，将调用[PictureCallback.onError]。
      *
      * @see PictureCallback
      */
@@ -115,12 +108,11 @@ interface GoldenEye {
     fun takePicture(onPictureTaken: (Bitmap) -> Unit, onError: (Throwable) -> Unit, onShutter: (() -> Unit)? = null)
 
     /**
-     * Asynchronously tries to record video. If any error happens,
-     * [VideoCallback.onError] is called.
+     * 异步尝试录制视频。如果发生任何错误，将调用[VideoCallback.onError]。
      *
-     * NOTE: Video recording is currently not supported for External sources!
+     * 注意：外部源当前不支持录制视频！
      *
-     * @param file which will be used to store the recording
+     * @param file 将用于存储记录
      *
      * @see VideoCallback
      */
@@ -132,7 +124,7 @@ interface GoldenEye {
     fun startRecording(file: File, onVideoRecorded: (File) -> Unit, onError: (Throwable) -> Unit)
 
     /**
-     * Stops video recording.
+     * 停止视频录制。
      */
     fun stopRecording()
 
@@ -213,34 +205,26 @@ interface GoldenEye {
         fun setPictureTransformation(transformation: PictureTransformation) = apply { this.pictureTransformation = transformation }
 
         /**
-         * Enables the use of [co.infinum.goldeneye.config.AdvancedFeatureConfig] features. Those features
-         * are experimental and disabled by default. If you try to change the value of any advanced feature,
-         * it will be ignored unless you enable them.
+         * 启用[co.infinum.goldeneye.config.AdvancedFeatureConfig]功能的使用。这些功能是实验性的，默认情况下是禁用的。如果您试图更改任何高级功能的值，除非您启用它们，否则它将被忽略。
          */
         fun withAdvancedFeatures() = apply { this.advancedFeaturesEnabled = true }
 
         /**
-         * Manually select Camera API version.
+         * 手动选择相机API版本。
          *
-         * It might be useful to force Camera1 API if application does not use video recording feature
-         * because it is more consistent when taking pictures with [co.infinum.goldeneye.models.FlashMode.ON].
+         * 如果应用程序不使用视频录制功能，强制使用Camera1 API可能会很有用，因为使用[co.infinum.goldeneye.models.FlashMode.ON]拍摄照片时，它会更加一致。
          *
-         * CAUTION: Video recording on newer Android devices can crash when using Camera1 API!
+         * 注意：使用Camera1 API时，较新Android设备上的视频录制可能会崩溃！
          *
          * @throws IllegalArgumentException when trying to force Camera2 API on devices older than Lollipop.
          */
         @Throws(IllegalArgumentException::class)
-        fun setCameraApi(cameraApi: CameraApi): GoldenEye.Builder {
-            if (cameraApi == CameraApi.CAMERA2 && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                throw IllegalArgumentException("Camera2 API is available from SDK 21.")
-            }
-
+        fun setCameraApi(cameraApi: CameraApi): Builder {
             return apply { this.cameraApi = cameraApi }
         }
 
         /**
-         * Builds GoldenEye implementation. Builds Camera1 API wrapper for devices older than
-         * LOLLIPOP and devices that use LEGACY camera, otherwise Camera2 API wrapper is built.
+         * 构建GoldenEye实现。为早于LOLLIPOP的设备和使用LEGACY相机的设备构建Camera1 API包装，否则将构建Camera2 API包装。
          */
         @SuppressLint("NewApi")
         fun build(): GoldenEye {

@@ -8,12 +8,13 @@ import android.graphics.Bitmap
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
-import android.support.annotation.RequiresPermission
 import android.view.TextureView
+import androidx.annotation.RequiresPermission
 import co.infinum.goldeneye.config.CameraConfig
 import co.infinum.goldeneye.config.CameraInfo
 import co.infinum.goldeneye.config.camera2.*
 import co.infinum.goldeneye.extensions.MAIN_HANDLER
+import co.infinum.goldeneye.extensions.ifNotNull
 import co.infinum.goldeneye.extensions.onSurfaceUpdate
 import co.infinum.goldeneye.gesture.GestureManager
 import co.infinum.goldeneye.gesture.ZoomHandlerImpl
@@ -23,6 +24,7 @@ import co.infinum.goldeneye.sessions.PictureSession
 import co.infinum.goldeneye.sessions.SessionsManager
 import co.infinum.goldeneye.sessions.VideoSession
 import co.infinum.goldeneye.utils.AsyncUtils
+import co.infinum.goldeneye.utils.CameraUtils
 import co.infinum.goldeneye.utils.Intrinsics
 import co.infinum.goldeneye.utils.LogDelegate
 import co.infinum.goldeneye.utils.LogDelegate.log
@@ -186,6 +188,9 @@ internal class GoldenEye2Impl(
         )
         this.gestureManager = GestureManager(activity, textureView, zoomHandler, focusHandler)
     }
+    override fun setZoomInOrZoomOut(value:Int){
+        gestureManager?.setZoomInOrZoomOut(value)
+    }
 
     override fun release() {
         releaseInternal()
@@ -274,6 +279,8 @@ internal class GoldenEye2Impl(
             val cameraInfo = object : CameraInfo {
                 override val id = id
                 override val orientation = orientation!!
+                override var rotateValue = 0
+                override var isMirrorInverted=false
                 override val facing = facing
             }
             val videoConfig = VideoConfigImpl(id, onConfigUpdateListener)
@@ -289,4 +296,5 @@ internal class GoldenEye2Impl(
             _availableCameras.add(cameraConfig)
         }
     }
+
 }

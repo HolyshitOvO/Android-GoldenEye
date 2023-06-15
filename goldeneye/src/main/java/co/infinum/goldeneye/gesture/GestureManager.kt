@@ -3,6 +3,7 @@ package co.infinum.goldeneye.gesture
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.PointF
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -33,10 +34,15 @@ internal class GestureManager(
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             val pinchDelta = detector.let { it.currentSpan - it.previousSpan } ?: 0f
+            Log.e("TAG████", "onScale: " + pinchDelta)
             zoomHandler.onPinchStarted(pinchDelta)
             return true
         }
     })
+
+    fun setZoomInOrZoomOut(value:Int){
+        zoomHandler.onPinchStarted(value.toFloat())
+    }
 
     private val tapDetector = GestureDetector(activity, object : GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapUp(e: MotionEvent): Boolean {

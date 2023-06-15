@@ -2,16 +2,15 @@ package co.infinum.goldeneye.config.camera2
 
 import android.hardware.camera2.CaptureRequest
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import co.infinum.goldeneye.models.CameraProperty
 import co.infinum.goldeneye.models.FlashMode
 import co.infinum.goldeneye.sessions.SessionsManager
 import co.infinum.goldeneye.utils.CameraUtils
 
 /**
- * Handles property updates. Syncs CameraConfig with active Camera2 session.
+ * 处理属性更新。将CameraConfig与活动的Camera2会话同步。
  */
-@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class ConfigUpdateHandler(
     private val sessionsManager: SessionsManager,
     private val config: Camera2ConfigImpl

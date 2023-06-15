@@ -9,11 +9,11 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.app.AppCompatDelegate
-import android.support.v7.widget.LinearLayoutManager
+import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.Log
 import android.view.Surface
 import android.view.TextureView
@@ -24,6 +24,7 @@ import co.infinum.goldeneye.InitCallback
 import co.infinum.goldeneye.Logger
 import co.infinum.goldeneye.config.CameraConfig
 import co.infinum.goldeneye.config.CameraInfo
+import co.infinum.goldeneye.models.CameraApi
 // import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.concurrent.Executors
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity() {
 	private lateinit var goldenEye: GoldenEye
 	private lateinit var videoFile: File
 	private var isRecording = false
+	private var rotateValue = 0
+	private var isMirrorInverted = false
 
 	private val mainHandler = Handler(Looper.getMainLooper())
 	private var settingsAdapter = SettingsAdapter(listOf())
@@ -95,14 +98,35 @@ class MainActivity : AppCompatActivity() {
 				startRecording()
 			}
 		}
-
+		// 切换 前置 后置
 		binding.switchCameraView.setOnClickListener { _ ->
 			val currentIndex = goldenEye.availableCameras.indexOfFirst { goldenEye.config?.id == it.id }
 			val nextIndex = (currentIndex + 1) % goldenEye.availableCameras.size
 			openCamera(goldenEye.availableCameras[nextIndex])
 		}
+		// 旋转画面
 		binding.btnTest1.setOnClickListener {
-
+			rotateValue+=90
+			if(rotateValue>270){
+				rotateValue=0
+			}
+			val currentIndex = goldenEye.availableCameras.indexOfFirst { goldenEye.config?.id == it.id }
+			// goldenEye.rotatePreview(rotateValue)
+			goldenEye.availableCameras[currentIndex].rotateValue = rotateValue
+			openCamera(goldenEye.availableCameras[currentIndex])
+		}
+		binding.btnTest2.setOnClickListener {
+			goldenEye.setZoomInOrZoomOut(300)
+		}
+		binding.btnTest3.setOnClickListener {
+			goldenEye.setZoomInOrZoomOut(-300)
+		}
+		binding.btnTest4.setOnClickListener {
+			isMirrorInverted=!isMirrorInverted
+			val currentIndex = goldenEye.availableCameras.indexOfFirst { goldenEye.config?.id == it.id }
+			// goldenEye.rotatePreview(rotateValue)
+			goldenEye.availableCameras[currentIndex].isMirrorInverted = isMirrorInverted
+			openCamera(goldenEye.availableCameras[currentIndex])
 		}
 	}
 
@@ -140,6 +164,7 @@ class MainActivity : AppCompatActivity() {
 
 	private fun initGoldenEye() {
 		goldenEye = GoldenEye.Builder(this)
+			.setCameraApi(CameraApi.CAMERA2)
 			.setLogger(logger)
 			.setOnZoomChangedCallback { binding.zoomView.text = "Zoom: ${it.toPercentage()}" }
 			.build()

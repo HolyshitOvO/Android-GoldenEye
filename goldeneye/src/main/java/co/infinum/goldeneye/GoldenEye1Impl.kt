@@ -5,8 +5,9 @@ package co.infinum.goldeneye
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.hardware.Camera
-import android.os.Build
+import android.util.Log
 import android.view.TextureView
 import co.infinum.goldeneye.config.CameraConfig
 import co.infinum.goldeneye.config.CameraInfo
@@ -20,6 +21,7 @@ import co.infinum.goldeneye.models.CameraApi
 import co.infinum.goldeneye.models.CameraProperty
 import co.infinum.goldeneye.models.CameraState
 import co.infinum.goldeneye.models.Facing
+import co.infinum.goldeneye.models.FlashMode
 import co.infinum.goldeneye.recorders.PictureRecorder
 import co.infinum.goldeneye.recorders.VideoRecorder
 import co.infinum.goldeneye.utils.AsyncUtils
@@ -87,6 +89,7 @@ internal class GoldenEye1Impl @JvmOverloads constructor(
         releaseInternal()
         AsyncUtils.stopBackgroundThread()
     }
+
 
     private fun releaseInternal() {
         state = CameraState.CLOSED
@@ -250,7 +253,7 @@ internal class GoldenEye1Impl @JvmOverloads constructor(
 
                 jpegQuality = _config.pictureQuality
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1 && _config.isVideoStabilizationSupported) {
+                if (_config.isVideoStabilizationSupported) {
                     videoStabilization = _config.videoStabilizationEnabled
                 }
 
@@ -259,7 +262,9 @@ internal class GoldenEye1Impl @JvmOverloads constructor(
                 }
 
                 if (_config.supportedFlashModes.contains(_config.flashMode)) {
-                    flashMode = _config.flashMode.toCamera1()
+                    // 这里已经彻底关闭了闪光灯
+                    // flashMode = _config.flashMode.toCamera1()
+                    flashMode = FlashMode.OFF.toCamera1()
                 }
 
                 if (_config.supportedAntibandingModes.contains(_config.antibandingMode)) {
@@ -290,6 +295,8 @@ internal class GoldenEye1Impl @JvmOverloads constructor(
             val cameraInfo = object : CameraInfo {
                 override val id = id.toString()
                 override val orientation = info.orientation
+                override var rotateValue = 0
+                override var isMirrorInverted=false
                 override val facing = facing
             }
 
@@ -305,5 +312,8 @@ internal class GoldenEye1Impl @JvmOverloads constructor(
                 )
             )
         }
+    }
+    override fun setZoomInOrZoomOut(value:Int){
+        gestureHandler?.setZoomInOrZoomOut(value)
     }
 }

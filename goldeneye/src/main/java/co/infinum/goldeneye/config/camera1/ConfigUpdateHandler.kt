@@ -9,6 +9,7 @@ import co.infinum.goldeneye.config.CameraConfig
 import co.infinum.goldeneye.extensions.updateParams
 import co.infinum.goldeneye.models.CameraProperty
 import co.infinum.goldeneye.models.CameraState
+import co.infinum.goldeneye.models.FlashMode
 import co.infinum.goldeneye.models.PreviewScale
 import co.infinum.goldeneye.models.Size
 
@@ -27,7 +28,9 @@ internal class ConfigUpdateHandler(
     fun onPropertyUpdated(property: CameraProperty) {
         when (property) {
             CameraProperty.FOCUS -> camera.updateParams { focusMode = config.focusMode.toCamera1() }
-            CameraProperty.FLASH -> camera.updateParams { flashMode = config.flashMode.toCamera1() }
+            // 这里注释了监听闪光灯配置的改变
+            CameraProperty.FLASH -> camera.updateParams {}
+            // CameraProperty.FLASH -> camera.updateParams { flashMode = config.flashMode.toCamera1() }
             CameraProperty.COLOR_EFFECT -> camera.updateParams { colorEffect = config.colorEffectMode.toCamera1() }
             CameraProperty.ANTIBANDING -> camera.updateParams { antibanding = config.antibandingMode.toCamera1() }
             CameraProperty.WHITE_BALANCE -> camera.updateParams { whiteBalance = config.whiteBalanceMode.toCamera1() }
